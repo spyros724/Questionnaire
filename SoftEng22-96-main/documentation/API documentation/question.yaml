@@ -1,0 +1,95 @@
+openapi: 3.0.0
+info:
+  title: IntelliQ API
+  description: API for accessing questionnaire and question data
+  version: 1.0.0
+servers:
+  - url: http://localhost:9103
+paths:
+  /intelliq_api/question/{questionnaireID}/{questionID}:
+    get:
+      summary: Retrieve question data
+      description: Retrieve data for a specific question within a questionnaire.
+      operationId: getIntelliQQuestion
+      parameters:
+        - in: path
+          name: questionnaireID
+          description: The ID of the questionnaire.
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: questionID
+          description: The ID of the question within the questionnaire.
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: format
+          description: The response format, either 'json' or 'csv'. Default is 'json'.
+          schema:
+            type: string
+            enum: [json, csv]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  questionnaireID:
+                    type: string
+                    description: The ID of the questionnaire.
+                  qID:
+                    type: string
+                    description: The ID of the question.
+                  qText:
+                    type: string
+                    description: The text of the question.
+                  required:
+                    type: boolean
+                    description: Whether the question is required.
+                  type:
+                    type: string
+                    description: The type of the question.
+                  options:
+                    type: array
+                    description: The list of options for the question.
+                    items:
+                      type: object
+                      properties:
+                        optID:
+                          type: string
+                          description: The ID of the option.
+                        opttxt:
+                          type: string
+                          description: The text of the option.
+                        nextqID:
+                          type: string
+                          description: The ID of the next question in the sequence, if applicable.
+          x-code-samples:
+            - lang: shell
+              source: curl http://localhost:9103/intelliq_api/question/123/456?format=json
+            - lang: shell
+              source: curl http://localhost:9103/intelliq_api/question/123/456?format=csv
+        '402':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message indicating no data was found for the provided questionnaire and question IDs.
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message indicating a server error occurred during the request.

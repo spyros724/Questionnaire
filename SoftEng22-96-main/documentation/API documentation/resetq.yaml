@@ -1,0 +1,77 @@
+openapi: 3.0.0
+info:
+  title: Intelliq API
+  version: 1.0.0
+servers:
+  - url: /intelliq_api/admin/resetq/{questionnaireID}
+paths:
+  /intelliq_api/admin/resetq/{questionnaireID}:
+    post:
+      parameters:
+        - in: path
+          name: questionnaireID
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: format
+          required: false
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: OK
+              x-code-samples:
+                - language: json
+                  content: |
+                    {
+                      "status": "OK"
+                    }
+        402:
+          description: No data - Answer data with questionnaire id [questionnaireID] were already reset
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: No data - Answer data with questionnaire id [questionnaireID] were already reset
+              x-code-samples:
+                - language: json
+                  content: |
+                    {
+                      "message": "No data - Answer data with questionnaire id [questionnaireID] were already reset"
+                    }
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: failed
+                  reason:
+                    type: string
+              x-code-samples:
+                - language: json
+                  content: |
+                    {
+                      "status": "failed",
+                      "reason": "Error message goes here"
+                    }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object

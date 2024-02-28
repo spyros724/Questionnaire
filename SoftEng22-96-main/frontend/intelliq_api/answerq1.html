@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link href="styles.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.14.0/css/all.css"
+    integrity="sha384-HzLeBuhoNPvSl5KYnjx0BT+WB0QEEqLprO+NBkkk5gbc67FTaL7XIGa2w1L0Xbgc" crossorigin="anonymous">
+  <div class="top-bar">
+    <a href="home_page.html" class="home-button"><i class="fas fa-home"></i></a>
+  </div>
+  <title>Questionnaire App</title>
+</head>
+
+<body>
+  <div style="display: flex; ">
+    <div style="width: 50%; text-align: center;">
+      <form>
+        <label for="questionnaire-id">Questionnaire ID:</label>
+        <input type="text" id="questionnaire-id" name="questionnaire-id">
+        <button type="button" id="submit-button" style="margin: auto;">Search</button>
+      </form>
+      <div id="questionnaire-title" style="text-align: center; font-weight: bold;"></div>
+      <div id="error-message" style="text-align: center;"></div>
+      <button type="button" id="continue-button"
+        style="display:none; margin: auto; text-align: center;">Continue</button>
+      <script>
+        const submitButton = document.getElementById('submit-button');
+        const questionnaireTitle = document.getElementById('questionnaire-title');
+        const errorMessage = document.getElementById('error-message');
+        const continueButton = document.getElementById('continue-button');
+
+        submitButton.addEventListener('click', () => {
+          const questionnaireId = document.getElementById('questionnaire-id').value;
+          fetch(`http://localhost:9103/intelliq_api/questionnaire/${questionnaireId}`)
+            .then(response => response.json())
+            .then(data => {
+              questionnaireTitle.innerHTML = data.questionnaireTitle;
+              continueButton.style.display = 'block';
+              continueButton.addEventListener('click', () => {
+                fetch(`http://localhost:9103/intelliq_api/postsession/${questionnaireId}`, {
+                  method: 'post',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({ questionnaireID: questionnaireId })
+                })
+                  .then(response => {
+                    console.log(response);
+                    return response.json();
+                    response.json()
+                  })
+                  .then(data => {
+                    const sessionId = data.sessionID;
+                    window.location.href = `answer.html?questionnaireId=${questionnaireId}&sessionId=${sessionId}`;
+                  })
+                  .catch(error => {
+                    console.log('Error:', error);
+                    errorMessage.innerHTML = "An error occurred. Please try again.";
+                  });
+              });
+            })
+            .catch(error => {
+              console.log('Error:', error);
+              errorMessage.innerHTML = "An error occurred. Please try again.";
+            });
+        });
+
+      </script>
+    </div>
+    <div style="width: 50%;">
+      <form>
+        <label for="keyword">Keyword:</label>
+        <input type="text" id="keyword" name="keyword">
+        <button type="button" id="search-button" style="margin: auto;">Search</button>
+      </form>
+      <div id="questionnaires-list"></div>
+      <div id="error-message-keyword"></div>
+      <script>
+        const searchButton = document.getElementById('search-button');
+        const questionnairesList = document.getElementById('questionnaires-list');
+        const errorMessageKeyword = document.getElementById('error-message-keyword');
+
+        let questionnaire;
+
+        searchButton.addEventListener('click', () => {
+          const keyword = document.getElementById('keyword').value;
+          fetch(`http://localhost:9103/intelliq_api/searchkeyword/${keyword}`)
+            .then(response => response.json())
+            .then(data => {
+              questionnairesList.innerHTML = "";
+              errorMessageKeyword.innerHTML = "";
+              for (const key in data.data) {
+                if (data.data.hasOwnProperty(key)) {
+                  questionnaire = data.data[key];
+                  questionnairesList.innerHTML += `
+            <h3>${questionnaire.questionnaireTitle}</h3>
+            <button type="button" class="continue-button" value="${questionnaire.questionnaireID}">Continue</button>
+          `;
+                }
+              }
+              const continueButtons = document.querySelectorAll('.continue-button');
+              continueButtons.forEach(continueButton => {
+                continueButton.addEventListener('click', () => {
+                  const questionnaireId = continueButton.value//questionnaire.questionnaireID;
+                  fetch(`/intelliq_api/postsession/${questionnaireId}`, {
+                    method: 'post',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ questionnaireID: questionnaireId })
+                  })
+                    .then(response => {
+                      console.log(response);
+                      return response.json();
+                    })
+                    .then(data => {
+                      const sessionId = data.sessionID;
+                      window.location.href = `answer.html?questionnaireId=${questionnaireId}&sessionId=${sessionId}`;
+                    })
+                    .catch(error => {
+                      console.log('Error:', error);
+                      errorMessageKeyword.innerHTML = "An error occurred. Please try again.";
+                    });
+                });
+              });
+            })
+            .catch(error => {
+              console.log('Error:', error);
+              errorMessageKeyword.innerHTML = "An error occurred. Please try again.";
+            });
+        });
+
+      </script>
+</body>
+
+</html>

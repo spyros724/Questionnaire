@@ -1,0 +1,1 @@
+python se2296.py %*

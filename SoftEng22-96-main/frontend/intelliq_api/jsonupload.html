@@ -1,0 +1,83 @@
+<html>
+
+<head>
+  <link href="styles.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.14.0/css/all.css"
+    integrity="sha384-HzLeBuhoNPvSl5KYnjx0BT+WB0QEEqLprO+NBkkk5gbc67FTaL7XIGa2w1L0Xbgc" crossorigin="anonymous">
+
+  <div class="top-bar">
+    <a href="home_page.html" class="home-button"><i class="fas fa-home"></i></a>
+  </div>
+  <script>
+    function uploadJsonFile() {
+      var file = document.getElementById("jsonFileInput").files[0];
+
+      var reader = new FileReader();
+      reader.onload = function (event) {
+        var jsonData = JSON.parse(event.target.result);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/intelliq_api/admin/questionnaire_upd", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function () {
+          if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+            document.getElementById("jsonResponse").innerHTML = this.responseText;
+          }
+        };
+        xhr.send(JSON.stringify(jsonData));
+      };
+      reader.readAsText(file);
+    }
+
+    function uploadCsvFile() {
+      var file = document.getElementById("csvFileInput").files[0];
+
+      var reader = new FileReader();
+      reader.onload = function (event) {
+        var csvData = event.target.result;
+        var jsonData = csvJSON(csvData);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/intelliq_api/admin/questionnaire_upd", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function () {
+          if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+            document.getElementById("csvResponse").innerHTML = this.responseText;
+          }
+        };
+        xhr.send(JSON.stringify(jsonData));
+      };
+      reader.readAsText(file);
+    }
+
+    function csvJSON(csv) {
+      var lines = csv.split("\n");
+      var result = [];
+      var headers = lines[0].split(",");
+
+      for (var i = 1; i < lines.length; i++) {
+        var obj = {};
+        var currentline = lines[i].split(",");
+
+        for (var j = 0; j < headers.length; j++) {
+          obj[headers[j]] = currentline[j];
+        }
+        result.push(obj);
+      }
+      return result;
+    }
+  </script>
+</head>
+
+<body>
+  <div class="instruction">Upload your JSON file</div>
+  <div style="display: flex;">
+    <div style="flex: 1;">
+      <input type="file" id="jsonFileInput" />
+      <button type="button" onclick="uploadJsonFile()">Upload</button>
+      <div id="jsonResponse"></div>
+    </div>
+  </div>
+</body>
+
+</html>

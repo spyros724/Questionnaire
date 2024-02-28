@@ -1,0 +1,118 @@
+openapi: 3.0.0
+info:
+  version: "1.0.0"
+  title: Intelliq API
+  description: API for Intelliq application
+paths:
+  /intelliq_api/getquestionanswers/{questionnaireID}/{questionID}:
+    get:
+      summary: Get answers for a specific question in a questionnaire
+      description: Returns the answers for a specific question in a questionnaire, identified by the questionnaireID and questionID provided
+      parameters:
+        - name: questionnaireID
+          in: path
+          description: The ID of the questionnaire
+          required: true
+          schema:
+            type: string
+        - name: questionID
+          in: path
+          description: The ID of the question
+          required: true
+          schema:
+            type: string
+        - name: format
+          in: query
+          description: Response format, either 'csv' or 'json'
+          required: false
+          schema:
+            type: string
+            enum:
+              - csv
+              - json
+      responses:
+        '200':
+          description: Successful operation, returns the answers for the specified question
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  questionnaireID:
+                    type: string
+                    description: The ID of the questionnaire
+                  questionID:
+                    type: string
+                    description: The ID of the question
+                  answers:
+                    type: array
+                    description: An array of objects containing the session and answer IDs for the specified question
+                    items:
+                      type: object
+                      properties:
+                        session:
+                          type: string
+                          description: The ID of the session
+                        ans:
+                          type: string
+                          description: The ID of the answer
+              examples:
+                application/json:
+                  value:
+                    questionnaireID: "Q001"
+                    questionID: "q6"
+                    answers:
+                      - session: "789"
+                        ans: "1"
+                      - session: "012"
+                        ans: "2"
+          x-code-samples:
+            - lang: javascript
+              source: |
+                const questionnaireID = 'Q001';
+                const questionID = 'q6';
+                const format = 'json';
+
+                fetch(`http://localhost:9103/intelliq_api/getquestionanswers/${questionnaireID}/${questionID}?format=${format}`)
+                  .then(response => response.json())
+                  .then(data => console.log(data))
+                  .catch(error => console.error(error));
+        '402':
+          description: No answer data found for the specified questionnaire and question
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+              examples:
+                application/json:
+                  value:
+                    message: "No answer data with questionnaire id Q001 and question id q6 found"
+          x-code-samples:
+            - lang: javascript
+              source: |
+                const questionnaireID = 'Q001';
+                const questionID = 'q6';
+                const format = 'json';
+
+                fetch(`http://localhost:9103/intelliq_api/getquestionanswers/${questionnaireID}/${questionID}?format=${format}`)
+                  .then(response => response.json())
+                  .then(data => console.log(data))
+                  .catch(error => console.error(error));
+        '500':
+          description: An error occurred while retrieving answer data for the specified questionnaire and question
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+              examples:
+                application/json:
+                  value:
+                   

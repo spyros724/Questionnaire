@@ -1,0 +1,113 @@
+openapi: 3.0.0
+info:
+  title: Intelliq API
+  description: API for retrieving questionnaire data from the Intelliq application
+  version: 1.0.0
+servers:
+  - url: http://localhost:9103
+paths:
+  /intelliq_api/questionnaire/{questionnaireID}:
+    get:
+      summary: Retrieve questionnaire data by ID
+      description: |
+        This API endpoint retrieves the questionnaire data for a given ID, including the questionnaire title, keywords associated with the questionnaire, and the questions included in the questionnaire.
+      operationId: getQuestionnaireByID
+      parameters:
+        - name: questionnaireID
+          in: path
+          required: true
+          description: The ID of the questionnaire to retrieve
+          schema:
+            type: integer
+        - name: format
+          in: query
+          required: false
+          description: The format of the response, either JSON or CSV
+          schema:
+            type: string
+            enum:
+              - json
+              - csv
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestionnaireResponse'
+              x-code-samples:
+                - lang: curl
+                  source: |
+                    curl -X GET "http://localhost:9103/intelliq_api/questionnaire/123" -H "accept: application/json"
+        '402':
+          description: Payment Required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              x-code-samples:
+                - lang: curl
+                  source: |
+                    curl -X GET "http://localhost:9103/intelliq_api/questionnaire/123?format=json" -H "accept: application/json"
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              x-code-samples:
+                - lang: curl
+                  source: |
+                    curl -X GET "http://localhost:9103/intelliq_api/questionnaire/123" -H "accept: application/json"
+      x-code-samples:
+        - lang: node
+          source: |
+            const axios = require('axios');
+            const qs = require('querystring');
+
+            axios.get('http://localhost:9103/intelliq_api/questionnaire/123?format=json')
+              .then(response => {
+                console.log(response.data);
+              })
+              .catch(error => {
+                console.error(error);
+              });
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+    QuestionnaireResponse:
+      type: object
+      properties:
+        questionnaireID:
+          type: integer
+          description: The ID of the questionnaire
+        questionnaireTitle:
+          type: string
+          description: The title of the questionnaire
+        keywords:
+          type: array
+          description: Keywords associated with the questionnaire
+          items:
+            type: string
+        questions:
+          type: array
+          description: The questions included in the questionnaire
+          items:
+            type: object
+            properties:
+              qID:
+                type: integer
+                description: The ID of the question
+              qText:
+                type: string
+                description: The text of the question
+              required:
+                type: boolean
+                description: Whether the question is required or not
+              type:
+                type: string
+                description: The type of the question

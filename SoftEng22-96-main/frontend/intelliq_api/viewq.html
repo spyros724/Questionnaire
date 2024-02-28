@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link href="styles.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.14.0/css/all.css"
+    integrity="sha384-HzLeBuhoNPvSl5KYnjx0BT+WB0QEEqLprO+NBkkk5gbc67FTaL7XIGa2w1L0Xbgc" crossorigin="anonymous">
+
+  <div class="top-bar">
+    <a href="home_page.html" class="home-button"><i class="fas fa-home"></i></a>
+  </div>
+  <title>View Your Answers</title>
+</head>
+
+<body>
+  <form>
+    <label for="questionnaire-id">Questionnaire ID:</label>
+    <input type="text" id="questionnaire-id" name="questionnaire-id">
+  </form>
+  <form>
+    <label for="question-id">Question ID:</label>
+    <input type="text" id="question-id" name="question-id">
+    <button type="button" id="submit-button">Submit</button>
+  </form>
+  <div id="error-message"></div>
+  <button type="button" id="continue-button" style="display:none;">View</button>
+  <script>
+    const submitButton = document.getElementById('submit-button');
+    //const questionnaireTitle = document.getElementById('questionnaire-title'); //
+    const errorMessage = document.getElementById('error-message');
+    const continueButton = document.getElementById('continue-button');
+
+    submitButton.addEventListener('click', () => {
+      const questionnaireId = document.getElementById('questionnaire-id').value;
+      const questionId = document.getElementById('question-id').value;
+      fetch(`http://localhost:9103/intelliq_api/question/${questionnaireId}/${questionId}`)
+        .then(response => response.json()) // gets its response 
+        .then(data => { //shows title and creates continue button 
+          continueButton.style.display = 'block'; //the style of the button
+          continueButton.addEventListener('click', () => {
+            window.location.href = `view.html?questionnaireId=${questionnaireId}&questionId=${questionId}`; //Enter 17 and p1
+          });
+        })
+        .catch(error => {
+          console.log('Error:', error);
+          errorMessage.innerHTML = "An error occurred. Please try again.";
+        });
+    });
+
+  </script>
+</body>
+
+</html>

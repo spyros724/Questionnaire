@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Statistics</title>
+  <link href="styles.css" rel="stylesheet" type="text/css">
+  <link href="viewstyles.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.14.0/css/all.css"
+    integrity="sha384-HzLeBuhoNPvSl5KYnjx0BT+WB0QEEqLprO+NBkkk5gbc67FTaL7XIGa2w1L0Xbgc" crossorigin="anonymous">
+  <div class="top-bar">
+    <a href="home_page.html" class="home-button"><i class="fas fa-home"></i></a>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+</head>
+
+<body>
+  <h2 style="text-align: center;">Add Demographic Criterion</h2>
+  <div style="display: flex; justify-content: center;">
+    <select id="dropdown" onchange="selectCriteria()">
+      <option selected disabled>Select Criteria</option>
+    </select>
+    <div id="question-text"></div>
+  </div>
+  <br>
+  <div style="display: flex; justify-content: center;">
+    <select id="options-dropdown" onchange="fetchDatafromDrop()">
+      <option selected disabled>Select demographic group</option>
+    </select>
+    <div id="question-text"></div>
+  </div>
+  <canvas id="pieChart"></canvas>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const questionnaireId = urlParams.get('questionnaireId');
+    const questionId = urlParams.get('questionId');
+
+    async function fetchData(questionnaireId, questionId) {
+      const response = await fetch(`/intelliq_api/question/${questionnaireId}/${questionId}`);
+      const data = await response.json();
+      return data;
+    }
+
+
+    const questionTextDiv = document.getElementById('question-text');
+    let selectedquestion = null;
+    let selectedOption = null;
+    const ctx = document.getElementById('pieChart').getContext('2d');
+    const pieChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Answer Count',
+          data: [],
+          backgroundColor: []
+        }]
+      },
+      options: {
+        title: {
+          display: true,
+          text: ''
+        }
+      }
+    });
+
+    const dropdown = document.getElementById('dropdown');
+    const optionsDropdown = document.getElementById('options-dropdown');
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', `/intelliq_api/searchtypeofquestion/${questionnaireId}/profile`, true);
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+        const data = JSON.parse(xhr.responseText).data;
+        for (let i = 0; i < data.length; i++) {
+          const option = document.createElement('option');
+          option.value = data[i].qID;
+          option.text = data[i].qText;
+          dropdown.add(option);
+        }
+      }
+    };
+    xhr.send();
+
+    async function fetchOptions(questionnaireId, selectedquestion) {
+      const response = await fetch(`/intelliq_api/question/${questionnaireId}/${selectedquestion}`);
+      const data = await response.json();
+      return data.options;
+    }
+
+    function selectCriteria() {
+      selectedquestion = dropdown.options[dropdown.selectedIndex].value;
+      console.log(selectedquestion);
+
+      /* while (optionsDropdown.firstChild) {
+         optionsDropdown.removeChild(optionsDropdown.firstChild);
+       }*/
+
+      fetchOptions(questionnaireId, selectedquestion).then(options => {
+        for (let i = 0; i < options.length; i++) {
+          const option = document.createElement('option');
+          option.value = options[i].optID;
+          option.text = options[i].opttxt;
+          optionsDropdown.add(option);
+        }
+      });
+    }
+
+    async function fetchDatafromDrop() {
+      selectedOption = optionsDropdown.options[optionsDropdown.selectedIndex].value;
+      console.log(selectedOption);
+      fetch(`http://localhost:9103/intelliq_api/advanced_count/${questionnaireId}/${questionId}/${selectedquestion}/${selectedOption}`)
+        .then(response => response.json())
+        .then(data => {
+          pieChart.data.labels = data.labels;
+          pieChart.data.datasets[0].data = data.data;
+          pieChart.data.datasets[0].backgroundColor = data.backgroundColor;
+          pieChart.update();
+        })
+        .catch(error => console.error(error));
+
+      fetch(`http://localhost:9103/intelliq_api/question/${questionnaireId}/${questionId}`)
+        .then(response => response.json())
+        .then(data => {
+          pieChart.options.title.text = data.qText;
+          data.options.forEach((option, index) => {
+            pieChart.data.labels[index] = option.opttxt;
+          });
+          pieChart.update();
+        })
+        .catch(error => console.error(error));
+    }
+  </script>
+  <button type="button" id="submit-button3"
+    onclick="location.href=`viewquestion.html?questionnaireId=${questionnaireId}`">Go back</button>
+</body>
+
+</html>

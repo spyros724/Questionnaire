@@ -1,0 +1,70 @@
+openapi: 3.0.2
+info:
+  title: Intelliq API
+  version: 1.0.0
+servers:
+  - url: /intelliq_api/admin/healthcheck
+paths:
+  /intelliq_api/admin/healthcheck:
+    get:
+      description: Check the health of the API and database connection
+      parameters:
+        - in: query
+          name: format
+          description: The format of the response, either "json" or "csv"
+          schema:
+            type: string
+            enum:
+              - json
+              - csv
+            default: json
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  dbconnection:
+                    type: string
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  dbconnection:
+                    type: string
+      x-code-samples:
+        - language: javascript
+          content: |
+            app.get('/intelliq_api/admin/healthcheck', (req, res) => {
+              const format = req.query.format;
+              var response;
+              var stcode = 200;
+              connection.query('SELECT 1', (error, results, fields) => {
+                var connection_string = "Server=localhost;Port=3306;Database=intelliq;Uid=root;Pwd='';";
+                  if (error) {
+                    response = { status: 'failed', dbconnection:  connection_string };
+                    stcode = 500;
+                  } else {
+                    response = { status: 'OK', dbconnection:  connection_string};
+                  }
+                  if (format == 'csv') {
+                    converter.json2csv(response, (err, csv) => {
+                      if (err) {
+                        throw err
+                      }
+                      res.send(csv);
+                    })
+                  } else {
+                    res.status(stcode).json(response)
+                  }
+                })
+              });

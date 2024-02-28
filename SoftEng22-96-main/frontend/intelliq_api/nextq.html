@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Answer</title>
+  <link href="styles.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.14.0/css/all.css"
+    integrity="sha384-HzLeBuhoNPvSl5KYnjx0BT+WB0QEEqLprO+NBkkk5gbc67FTaL7XIGa2w1L0Xbgc" crossorigin="anonymous">
+
+  <div class="top-bar">
+    <a href="home_page.html" class="home-button"><i class="fas fa-home"></i></a>
+  </div>
+  <link href="questionnairestyles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="sessionId"></div>
+    <div id="questionnaireId"></div>
+    <div id="qId"></div>
+    <div id="question-text"></div>
+    <div id="options"></div>
+  </div>
+
+  <script>
+    //const questionnaireIdDiv = document.getElementById('questionnaire-id');
+    const urlParams = new URLSearchParams(window.location.search);
+    const questionnaireId = urlParams.get('questionnaireId');
+    const qId = urlParams.get('qId');
+    const sessionId = urlParams.get('sessionId');
+    document.getElementById("questionnaireId").innerHTML = `Questionnaire Id: ${questionnaireId}`;
+    document.getElementById("qId").innerHTML = `Question Id: ${qId}`;
+    //document.getElementById("sessionId").innerHTML = `Session Id: ${sessionId}`;
+    //questionnaireIdDiv.innerHTML = `Questionnaire ID: ${questionnaireId}`;
+
+    async function fetchData(questionnaireId, questionId) {
+      const response = await fetch(`/intelliq_api/question/${questionnaireId}/${questionId}`);
+      const data = await response.json();
+      return data;
+    }
+
+    async function fetchMinQuestionId(questionnaireId) {
+      const response = await fetch(`/intelliq_api/minquestion/${questionnaireId}`);
+      const data = await response.json();
+      return data.min_question_id;
+    }
+
+    const questionTextDiv = document.getElementById('question-text');
+    const optionsDiv = document.getElementById('options');
+    let selectedOptionId = null;
+
+    fetchData(questionnaireId, qId).then(data => {
+      const { qText, options } = data;
+      questionTextDiv.innerHTML = `${qText}`;
+      optionsDiv.innerHTML = options.map(option => {
+        return `
+              <div>
+                <input type="radio" id="${option.optID}" name="option" onclick="handleOptionClick(this.id, '${option.nextqID}')" />
+                <label for="${option.optID}">${option.opttxt}</label>
+              </div>
+            `;
+      }).join('');
+    });
+
+    let submitButtonAdded = false;
+    function handleOptionClick(id, nextqID) {
+      selectedOptionId = id;
+      selectedOptionNextqID = nextqID;
+      if (!submitButtonAdded) {
+        submitButtonAdded = true;
+        const submitButton = document.createElement('button');
+        submitButton.innerHTML = 'Submit';
+        submitButton.onclick = handleSubmitClick;
+        submitButton.type = "button";
+        optionsDiv.appendChild(submitButton);
+      }
+    }
+
+    async function handleSubmitClick() {
+      if (selectedOptionNextqID === '-') {
+        console.log('End');
+        const response = await fetch(`/intelliq_api/doanswer/${questionnaireId}/${qId}/${sessionId}/${selectedOptionId}`, {
+          method: 'POST'
+        });
+        if (response.ok) {
+          console.log("Answer saved successfully");
+        } else {
+          console.error("Error saving answer");
+        }
+        window.location.href = `end_page.html`;
+      } else {
+        console.log(selectedOptionNextqID);
+        const response = await fetch(`/intelliq_api/doanswer/${questionnaireId}/${qId}/${sessionId}/${selectedOptionId}`, {
+          method: 'POST'
+        });
+        if (response.ok) {
+          console.log("Answer saved successfully");
+        } else {
+          console.error("Error saving answer");
+        }
+        window.location.href = `nextq.html?questionnaireId=${questionnaireId}&qId=${selectedOptionNextqID}&sessionId=${sessionId}`;
+      }
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="styles.css" rel="stylesheet" type="text/css">
+    <title>Questionnaire App</title>
+</head>
+
+<body>
+    <div class="container" id="row-container">
+        <!--{% include "flash_messages.html" %}-->
+        <div class="row" id="row">
+            <div class="col-md-4">
+                <div class="card" id="card-container-layout">
+                    <div class="card-body" id="card">
+                        <h4 class="card-title">Create new Questionnaire</h4>
+                        <button type="button" id="submit-button1"
+                            onclick="location.href='jsonupload.html'">Browse</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card" id="card-container-layout">
+                    <div class="card-body" id="card">
+                        <h4 class="card-title">Answer a Questionnaire</h4>
+                        <p class="card-text" id="paragraph"></p>
+                        <button type="button" id="submit-button2" onclick="location.href='answerq1.html'">Let's
+                            Go!</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card" id="card-container-layout">
+                    <div class="card-body" id="card">
+                        <h4 class="card-title">View Results of a Questionnaire</h4>
+                        <button type="button" id="submit-button3"
+                            onclick="location.href='viewquestionnaire.html'">Browse</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

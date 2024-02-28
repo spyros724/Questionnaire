@@ -1,0 +1,90 @@
+openapi: 3.0.0
+info:
+  title: Intelliq API
+  version: 1.0.0
+servers:
+  - url: http://localhost:9103
+paths:
+  /intelliq_api/getsessionanswers/{questionnaireID}/{sessionID}:
+    get:
+      summary: Retrieves answer data for a given questionnaire and session.
+      parameters:
+        - name: questionnaireID
+          in: path
+          description: The ID of the questionnaire.
+          required: true
+          schema:
+            type: string
+        - name: sessionID
+          in: path
+          description: The ID of the session.
+          required: true
+          schema:
+            type: string
+        - name: format
+          in: query
+          description: The format of the response (json or csv).
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  questionnaireID:
+                    type: string
+                    description: The ID of the questionnaire.
+                  sessionID:
+                    type: string
+                    description: The ID of the session.
+                  answers:
+                    type: array
+                    description: The list of question and answer IDs.
+                    items:
+                      type: object
+                      properties:
+                        qID:
+                          type: string
+                          description: The ID of the question.
+                        ans:
+                          type: string
+                          description: The ID of the answer.
+            text/csv:
+              schema:
+                type: string
+          x-code-samples:
+            - lang: javascript
+              source: |
+                const fetch = require('node-fetch');
+                const questionnaireID = 'example_questionnaire_id';
+                const sessionID = 'example_session_id';
+                const url = `http://localhost:9103/intelliq_api/getsessionanswers/${questionnaireID}/${sessionID}?format=json`;
+                
+                fetch(url)
+                  .then(response => response.json())
+                  .then(data => console.log(data))
+                  .catch(error => console.error(error));
+        '402':
+          description: No data found for the given questionnaire and session.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message.
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message.

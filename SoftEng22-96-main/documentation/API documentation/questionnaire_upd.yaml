@@ -1,0 +1,108 @@
+openapi: 3.0.0
+info:
+  title: IntelliQ API
+  description: API for managing questionnaires in the IntelliQ system
+  version: 1.0.0
+servers:
+  - url: /intelliq_api/admin
+paths:
+  /questionnaire_upd:
+    post:
+      operationId: addQuestionnaire
+      summary: Add a new questionnaire
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                questionnaireID:
+                  type: integer
+                  description: ID of the questionnaire
+                questionnaireTitle:
+                  type: string
+                  description: Title of the questionnaire
+                keywords:
+                  type: array
+                  items:
+                    type: string
+                  description: List of keywords associated with the questionnaire
+                questions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      qID:
+                        type: integer
+                        description: ID of the question
+                      qtext:
+                        type: string
+                        description: Text of the question
+                      required:
+                        type: boolean
+                        description: Indicates whether the question is required or not
+                      type:
+                        type: string
+                        description: Type of the question (e.g. multiple choice, text)
+                      options:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            optID:
+                              type: integer
+                              description: ID of the option
+                            opttxt:
+                              type: string
+                              description: Text of the option
+                            nextqID:
+                              type: integer
+                              description: ID of the next question to be displayed after this option is selected
+                  description: List of questions in the questionnaire
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: Data inserted successfully!
+      x-code-samples:
+        - language: javascript
+          content: |
+            app.post('/intelliq_api/admin/questionnaire_upd', (req, res) => {
+              const data = req.body;
+
+              // Insert data into the questionnaire table
+              const questionnaire_data = [data.questionnaireID, data.questionnaireTitle];
+              connection.query("INSERT IGNORE INTO questionnaire (questionnaireID, questionnaireTitle) VALUES (?, ?)", questionnaire_data, (error, results) => {
+                  if (error) throw error;
+                  var questionnaire_id = data.questionnaireID;
+                  // Insert data into the keywords table
+                  for (let keyword of data.keywords) {
+                      const keyword_data = [keyword, questionnaire_id];
+                      connection.query("INSERT IGNORE INTO keyword (Keywords, questionnaireID) VALUES (?, ?)", keyword_data, (error, results) => {
+                          if (error) throw error;
+                      });
+                  }
+                  // Insert data into the questions table
+                  for (let question of data.questions) {
+                      const question_data = [question.qID, question.qtext, question.required, question.type, questionnaire_id];
+                      connection.query("INSERT IGNORE INTO question (qID, qText, required, type, questionnaireID) VALUES (?, ?, ?, ?, ?)", question_data, (error, results) => {
+                      if (error) throw error;
+                      var question_id = question.qID;
+                      // Insert data into the options table
+                      for (let option of question.options) {
+                          const option_data = [option.optID, option.opttxt, option.nextqID, question_id, questionnaire_id];
+                          //console.log(`Option data: ${option_data}`);
+                          connection.query("INSERT IGNORE INTO option (optID, opttxt, nextqID, qID, questionnaireID) VALUES (?, ?, ?, ?, ?)", option_data, (error, results) => {
+                              if (error) throw error;
+                              //console.log(`Option inserted: ${option}`);
+                          });
+                      }
+                  });
+              }
+              res.send(`Data inserted successfully!`);
+          );
+        )

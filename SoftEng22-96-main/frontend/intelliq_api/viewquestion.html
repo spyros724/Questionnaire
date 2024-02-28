@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link href="styles.css" rel="stylesheet" type="text/css">
+  <link href="viewstyles.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.14.0/css/all.css"
+    integrity="sha384-HzLeBuhoNPvSl5KYnjx0BT+WB0QEEqLprO+NBkkk5gbc67FTaL7XIGa2w1L0Xbgc" crossorigin="anonymous">
+  <div class="top-bar">
+    <a href="home_page.html" class="home-button"><i class="fas fa-home"></i></a>
+  </div>
+  <title>Questionnaire App</title>
+</head>
+
+<body>
+  <div id="questionnaires-list"></div>
+  <div id="error-message-keyword"></div>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const questionnaireId = urlParams.get('questionnaireId');
+    const questionnairesList = document.getElementById('questionnaires-list');
+    const errorMessageKeyword = document.getElementById('error-message-keyword');
+
+    let questionnaires;
+
+    fetch(`http://localhost:9103/intelliq_api/searchtypeofquestion/${questionnaireId}/question`)
+      .then(response => response.json())
+      .then(data => {
+        questionnairesList.innerHTML = "";
+        errorMessageKeyword.innerHTML = "";
+        questionnaires = data.data;
+        for (let i = 0; i < questionnaires.length; i++) {
+          questionnairesList.innerHTML += `
+            <h3>${questionnaires[i].qText}</h3>
+            <button type="button" class="continue-button" data-index="${i}">View statistics</button>
+            <button type="button" class="continue-button-copy" data-index="${i}">View advanced statistics</button>
+          `;
+        }
+        const continueButtons = document.querySelectorAll('.continue-button');
+        const continueButtonsCopy = document.querySelectorAll('.continue-button-copy');
+
+        continueButtons.forEach(continueButton => {
+          continueButton.addEventListener('click', () => {
+            const index = continueButton.getAttribute('data-index');
+            const questionId = questionnaires[index].qID;
+            fetch(`/intelliq_api/postsession/${questionnaireId}`, {
+              method: 'post',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ questionnaireID: questionnaireId })
+            })
+              .then(response => {
+                console.log(response);
+                return response.json();
+              })
+              .then(data => {
+                window.location.href = `view.html?questionnaireId=${questionnaireId}&questionId=${questionId}`;
+              })
+              .catch(error => {
+                console.log('Error:', error);
+                errorMessageKeyword.innerHTML = "An error occurred. Please try again.";
+              });
+          });
+        });
+
+        continueButtonsCopy.forEach(continueButtonCopy => {
+          continueButtonCopy.addEventListener('click', () => {
+            const index = continueButtonCopy.getAttribute('data-index');
+            const questionId = questionnaires[index].qID;
+            fetch(`/intelliq_api/postsession/${questionnaireId}`, {
+              method: 'post',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ questionnaireID: questionnaireId })
+            })
+              .then(response => {
+                console.log(response);
+                return response.json();
+              })
+              .then(data => {
+                window.location.href = `advancedview.html?questionnaireId=${questionnaireId}&questionId=${questionId}`;
+              })
+              .catch(error => {
+                console.log('Error:', error);
+                errorMessageKeyword.innerHTML = "An error occurred. Please try again.";
+              });
+          });
+        });
+
+      })
+      .catch(error => {
+        console.log('Error:', error);
+        errorMessageKeyword.innerHTML = "An error occurred. Please try again.";
+      });
+
+  </script>
+</body>
+
+</html>

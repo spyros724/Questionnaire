@@ -1,0 +1,163 @@
+
+ {
+ "questionnaireID": "42",
+ "questionnaireTitle": "Football Fans",
+ "keywords": [
+ "sport",
+ "football",
+ "ball"
+ ],
+ "questions": [
+ {
+ "qID": "p1",
+ "qtext": "Are you male or female?",
+ "required": "TRUE",
+ "type": "profile",
+ "options": [
+ {
+ "optID": "o1",
+ "opttxt": "Men !",
+ "nextqID": "q1"
+ },
+ {
+ "optID": "o2",
+ "opttxt": "Women!",
+ "nextqID": "q1"
+ } 
+ ]
+ },
+ {
+ "qID": "q1",
+ "qtext": "Do you like Football?",
+ "required": "TRUE",
+ "type": "question",
+ "options": [
+ {
+ "optID": "o1",
+ "opttxt": "yEs!",
+ "nextqID": "q2"
+ },
+ {
+ "optID": "o2",
+ "opttxt": "No:(",
+ "nextqID": "q7"
+ }
+ ]
+ },
+ {
+ "qID": "q2",
+ "qtext": "Is it called Football or Soccer, hmm?",
+ "required": "TRUE",
+ "type": "question",
+ "options": [
+ {
+ "optID": "o1",
+ "opttxt": "Football",
+ "nextqID": "q3"
+},
+{
+"optID": "o2"
+,
+"opttxt":"Soccer"
+,
+"nextqID": "q6"
+}
+]
+},
+{
+"qID": "q3",
+"qtext": "Greek Football or EuroCup?",
+"required": "TRUE",
+"type": "question",
+"options": [
+{
+"optID": "o1",
+"opttxt": "Elladara re",
+"nextqID": "q4"
+},
+{
+"optID": "o2",
+"opttxt":"euromudial",
+"nextqID": "q5"
+}
+]
+},
+{
+"qID": "q4",
+"qtext": "IS better AEK or ASTERAS_Threepolis or PANAHAIK?",
+"required": "TRUE",
+"type": "question",
+"options": [
+{
+"optID": "o1",
+"opttxt": "AEKARAAAA",
+"nextqID": "q7"
+},
+{
+"optID": "o2",
+"opttxt":"ASTERAra",
+"nextqID": "q7"
+},
+{
+"optID": "o3",
+"opttxt":"Panahaik",
+"nextqID": "q7"
+}
+]
+},
+{
+"qID": "q5",
+"qtext": "Liverpool or Something_Spanish",
+"required": "TRUE",
+"type": "question",
+"options": [
+{
+"optID": "o1",
+"opttxt": "LIver",
+"nextqID": "q7"
+},
+{
+"optID": "o2",
+"opttxt":"Real MAdrid",
+"nextqID": "q7"
+}
+]
+},
+{
+"qID": "q6",
+"qtext": "You say Soccer, what are you, American?",
+"required": "TRUE",
+"type": "question",
+"options": [
+{
+"optID": "o1",
+"opttxt": "No sir",
+"nextqID": "q7"
+},
+{
+"optID": "o2",
+"opttxt":"USA USA USa",
+"nextqID": "q7"
+}
+]
+},
+{
+"qID": "q7",
+"qtext": "Did you play sports with your father?",
+"required": "FALSE",
+"type": "question",
+"options": [
+{
+"optID": "o1",
+"opttxt": "no :(",
+"nextqID": "-"
+},
+{
+"optID": "o2",
+"opttxt":"yes :)",
+"nextqID": "-"
+}
+]
+}
+]
+}    

@@ -1,0 +1,112 @@
+openapi: 3.0.0
+info:
+  title: IntelliQ API
+  version: 1.0.0
+  description: API for retrieving and submitting questionnaire data
+
+servers:
+  - url: 'http://localhost:9103'
+
+paths:
+  /intelliq_api/doanswer/{questionnaireID}/{questionID}/{session}/{optionID}:
+    post:
+      summary: Submit an answer to a questionnaire question
+      parameters:
+        - name: questionnaireID
+          in: path
+          description: ID of the questionnaire
+          required: true
+          schema:
+            type: integer
+        - name: questionID
+          in: path
+          description: ID of the question
+          required: true
+          schema:
+            type: integer
+        - name: session
+          in: path
+          description: ID of the session
+          required: true
+          schema:
+            type: integer
+        - name: optionID
+          in: path
+          description: ID of the selected answer option
+          required: true
+          schema:
+            type: integer
+        - name: format
+          in: query
+          description: Response format (json or csv)
+          schema:
+            type: string
+            enum: [json, csv]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Message indicating success
+                  example:
+                    message: ok
+            text/csv:
+              schema:
+                type: string
+                description: CSV formatted response
+              example: "message\nok\n"
+          x-code-samples:
+            - lang: javascript
+              source: |
+                const axios = require('axios');
+
+                const apiUrl = 'http://localhost:9103/intelliq_api/doanswer';
+                const questionnaireID = Q001;
+                const questionID = 2;
+                const session = 3;
+                const optionID = 4;
+                const format = 'csv';
+
+                axios.post(`${apiUrl}/${questionnaireID}/${questionID}/${session}/${optionID}?format=${format}`)
+                  .then((response) => {
+                    console.log(response.data);
+                  })
+                  .catch((error) => {
+                    console.error(error);
+                  });
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+                  example:
+                    message: Error inserting answer data with question id 2, questionnaire id Q001, session id 3 and option id 4
+            text/csv:
+              schema:
+                type: string
+                description: CSV formatted response
+              example: "message\nError inserting answer data with question id 2, questionnaire id Q001, session id 3 and option id 4\n"
+          x-code-samples:
+            - lang: javascript
+              source: |
+                const axios = require('axios');
+
+                const apiUrl = 'http://localhost:9103/intelliq_api/doanswer';
+                const questionnaireID = Q001;
+                const questionID = 2;
+                const session = 3;
+                const optionID = 4;
+                const format = 'csv';
+
+                axios.post(`${apiUrl}/${questionnaireID}/${questionID}/${session}/${optionID}?format=${format}`)
+                  .then((response) =>

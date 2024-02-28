@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Statistics</title>
+    <link href="styles.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.14.0/css/all.css"
+        integrity="sha384-HzLeBuhoNPvSl5KYnjx0BT+WB0QEEqLprO+NBkkk5gbc67FTaL7XIGa2w1L0Xbgc" crossorigin="anonymous">
+
+    <div class="top-bar">
+        <a href="home_page.html" class="home-button"><i class="fas fa-home"></i></a>
+    </div>
+    <link href="styles.css" rel="stylesheet" type="text/css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+</head>
+
+<body>
+    <canvas id="pieChart"></canvas>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const questionnaireId = urlParams.get('questionnaireId');
+        const questionId = urlParams.get('questionId');
+
+        const ctx = document.getElementById('pieChart').getContext('2d');
+        const pieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Answer Count',
+                    data: [],
+                    backgroundColor: []
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: ''
+                }
+            }
+        });
+
+        fetch(`http://localhost:9103/intelliq_api/answer_count/${questionnaireId}/${questionId}`)
+            .then(response => response.json())
+            .then(data => {
+                pieChart.data.labels = data.labels;
+                pieChart.data.datasets[0].data = data.data;
+                pieChart.data.datasets[0].backgroundColor = data.backgroundColor;
+                pieChart.update();
+            })
+            .catch(error => console.error(error));
+
+        fetch(`http://localhost:9103/intelliq_api/question/${questionnaireId}/${questionId}`)
+            .then(response => response.json())
+            .then(data => {
+                pieChart.options.title.text = data.qText;
+                var index = 0;
+                data.options.forEach((option) => {
+                    pieChart.data.labels[index] = option.opttxt;
+                    index++;
+                });
+                pieChart.update();
+            })
+            .catch(error => console.error(error));
+    </script>
+    <button type="button" id="submit-button3"
+        onclick="location.href=`viewquestion.html?questionnaireId=${questionnaireId}`">Go back</button>
+</body>
+
+</html>

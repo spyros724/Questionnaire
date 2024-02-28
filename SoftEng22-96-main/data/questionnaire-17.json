@@ -1,0 +1,177 @@
+
+ {
+ "questionnaireID": "17",
+ "questionnaireTitle": "Baskeeet",
+ "keywords": [
+ "basket",
+ "ball"
+ ],
+ "questions": [
+ {
+ "qID": "p1",
+ "qtext": "Are you male or female?",
+ "required": "TRUE",
+ "type": "profile",
+ "options": [
+ {
+ "optID": "o1",
+ "opttxt": "i am man",
+ "nextqID": "q1"
+ },
+ {
+ "optID": "o2",
+ "opttxt": "Women!",
+ "nextqID": "q1"
+ } 
+ ]
+ },
+ {
+ "qID": "q1",
+ "qtext": "Do you like Football?",
+ "required": "TRUE",
+ "type": "question",
+ "options": [
+ {
+ "optID": "o1",
+ "opttxt": "yEs!",
+ "nextqID": "q2"
+ },
+ {
+ "optID": "o2",
+ "opttxt": "No:(",
+ "nextqID": "q2"
+ }
+ ]
+ },
+ {
+ "qID": "q2",
+ "qtext": "Football or Baskeeeeeet, hmm?",
+ "required": "TRUE",
+ "type": "question",
+ "options": [
+ {
+ "optID": "o1",
+ "opttxt": "Football",
+ "nextqID": "q7"
+},
+{
+"optID": "o2"
+,
+"opttxt":"Baskeballs"
+,
+"nextqID": "q3"
+}
+]
+},
+{
+"qID": "q3",
+"qtext": "What is the best shape of ball?",
+"required": "TRUE",
+"type": "question",
+"options": [
+{
+"optID": "o1",
+"opttxt": "round",
+"nextqID": "q5"
+},
+{
+"optID": "o2",
+"opttxt":"square",
+"nextqID": "q4"
+}
+]
+},
+{
+"qID": "q4",
+"qtext": "What kind of geometry do you live in?",
+"required": "TRUE",
+"type": "question",
+"options": [
+{
+"optID": "o1",
+"opttxt": "euclidean",
+"nextqID": "q5"
+},
+{
+"optID": "o2",
+"opttxt":"hyperbolic",
+"nextqID": "q5"
+},
+{
+"optID": "o3",
+"opttxt":"ball geometry",
+"nextqID": "q5"
+}
+]
+},
+{
+"qID": "q5",
+"qtext": "optimal number of ball",
+"required": "TRUE",
+"type": "question",
+"options": [    
+{
+"optID": "o1",
+"opttxt": "no ballz",
+"nextqID": "q6"
+},    
+{
+"optID": "o2",
+"opttxt": "1",
+"nextqID": "q6"
+},
+{
+"optID": "o3",
+"opttxt":"five",
+"nextqID": "q6"
+},
+{
+"optID": "o4",
+"opttxt":"27",
+"nextqID": "q6"
+},
+{
+"optID": "o5",
+"opttxt":"6420",
+"nextqID": "q6"
+}
+]
+},
+{
+"qID": "q6",
+"qtext": "are you an athlete?",
+"required": "TRUE",
+"type": "question",
+"options": [
+{
+"optID": "o1",
+"opttxt": "yes i am",
+"nextqID": "q7"
+},
+{
+"optID": "o2",
+"opttxt": "not really",
+"nextqID": "q7"
+}
+]
+},
+{
+"qID": "q7",
+"qtext": "did you have a mother figure in your life",
+"required": "FALSE",
+"type": "question",
+"options": [
+{
+"optID": "o1",
+"opttxt": "no :)",
+"nextqID": "-"
+},
+{
+"optID": "o2",
+"opttxt":"yes :(",
+"nextqID": "-"
+}
+]
+}
+]
+}    

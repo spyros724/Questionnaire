@@ -1,0 +1,119 @@
+openapi: 3.0.0
+info:
+  title: IntelliQ API
+  version: 1.0.0
+paths:
+  /intelliq_api/admin/resetall:
+    post:
+      description: |
+        This endpoint is used to reset all data in the questionnaire, keyword, answer, session, option, question, and questionnaire tables.
+      parameters:
+        - name: format
+          in: query
+          description: Format for the response, either 'csv' or 'json'
+          required: false
+          schema:
+            type: string
+      responses:
+        200:
+          description: |
+            Returns 'OK' if the data was reset successfully, or 'No data - Entries were already reset' if there was no data to reset.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: ['OK', 'No data - Entries were already reset']
+        402:
+          description: |
+            Returned if there was no data to reset.
+            The response message will be 'No data - Entries were already reset'.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        500:
+          description: |
+            Returns 'failed' if there was an error resetting the data. The 'reason' property will contain the error message.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: ['failed']
+                  reason:
+                    type: string
+      x-code-samples:
+        - language: javascript
+          content: |
+            app.post('/intelliq_api/admin/resetall', (req, res) => {
+              var format = req.query.format;
+              var problem=false; 
+              var response = {status: 'OK'};
+              var stcode = 200;
+              var failed;
+              connection.query('SELECT * FROM questionnaire;', (error, results, fields) => {  
+                if (results.length == 0) {
+                  response = { message: `No data - Entries were already reset` };
+                  stcode = 402;
+                } else {
+                  var delete_query ="DELETE FROM keyword;";
+                  connection.query(delete_query, (error, results, fields) => {
+                    if (error) {
+                      problem=true; failed = error;
+                    }
+                    });
+                  delete_query = "DELETE FROM answer;";
+                  connection.query(delete_query, (error, results, fields) => {
+                    if (error) {
+                      problem=true; failed = error;
+                    }
+                    });
+                    delete_query ="DELETE FROM session;";
+                  connection.query(delete_query, (error, results, fields) => {
+                    if (error) {
+                      problem=true; failed = error;
+                    }
+                    });
+                  delete_query =  "DELETE FROM option;";
+                  connection.query(delete_query, (error, results, fields) => {
+                    if (error) {
+                      problem=true; failed = error;
+                    }
+                    });
+                  delete_query = "DELETE FROM question;";
+                  connection.query(delete_query, (error, results, fields) => {
+                    if (error) {
+                      problem=true; failed = error;
+                    }
+                    });
+                  delete_query =  "DELETE FROM questionnaire;";
+                  connection.query(delete_query, (error, results, fields) => {
+                    if (error) {
+                      problem=true; failed = error;
+                    }
+                    if(problem) {
+                      response = { status: 'failed', reason: failed };
+                      stcode = 500;
+                    }
+                  });
+                }
+                if (format == 'csv') {
+                  converter.json2csv(response, (err, csv) => {
+                    if (err) {
+                      throw err
+                    }
+                    res.send(csv);
+                  })
+                } else {
+                  res.status(stcode).json(response)
+                }
+              });
+            });
